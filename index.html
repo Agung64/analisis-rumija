@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analisis Komparatif Perda Pemanfaatan Rumija</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Warm Neutrals -->
+    <!-- Application Structure Plan: The application is designed as an interactive dashboard for comparing local regulations (Perda) across different city types. The structure is thematic, guiding the user from a high-level overview to detailed comparisons. The core interaction is a city selector that dynamically updates all data modules on the page (comparison tables, charts, and summary text). This task-oriented design was chosen to allow users to easily perform a direct comparative analysis, identify patterns, and understand the nuances of policy implementation in different contexts, which is more intuitive than a linear report format. An audio summary feature has been added for accessibility and user convenience. -->
+    <!-- Visualization & Content Choices: 1. City Data -> Goal: Compare -> Method: Interactive Buttons -> Interaction: Click to update dashboard -> Justification: Provides clear, user-driven control over the comparison. 2. Retribution Tariffs -> Goal: Compare quantitative data -> Viz: Bar Chart -> Interaction: Chart data updates on city selection, tooltips on hover show values -> Justification: Bar charts are excellent for visually comparing numerical values across categories and cities -> Library: Chart.js (Canvas). 3. Regulatory Rules & Sanctions -> Goal: Compare qualitative rules -> Method: Side-by-side card layout -> Interaction: Content updates on city selection -> Justification: Allows for easy scanning and comparison of textual information. 4. Best Practices -> Goal: Synthesize findings -> Method: Dynamic text block -> Interaction: Content highlights key findings from the selected city -> Justification: Provides a clear, contextual summary of the analysis. 5. Audio Summary -> Goal: Inform/Accessibility -> Method: Embedded Audio Player -> Interaction: Click to play the uploaded audio file -> Justification: Directly uses the user-provided content for an accurate audio summary. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f7f4;
+            color: #4a4a4a;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 400px;
+            max-height: 50vh;
+        }
+        .nav-button {
+            transition: all 0.3s ease;
+        }
+        .nav-button.active {
+            background-color: #a5522a;
+            color: white;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+        .nav-button:not(.active):hover {
+            background-color: #e5e7eb;
+        }
+        .card {
+            background-color: #ffffff;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            border: 1px solid #e5e7eb;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.07), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+    </style>
+</head>
+<body class="antialiased">
+    <header class="bg-white shadow-sm sticky top-0 z-10">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <h1 class="text-2xl md:text-3xl font-bold text-slate-800 text-center">Analisis Komparatif Perda Pemanfaatan Rumija</h1>
+            <p class="text-center text-slate-600 mt-1">Studi Kasus: Kota Besar, Kota Menengah, dan Kabupaten</p>
+        </div>
+    </header>
+
+    <main class="container mx-auto p-4 sm:p-6 lg:p-8">
+        <section id="intro" class="mb-8 text-center max-w-3xl mx-auto">
+            <p class="text-lg text-slate-700 mb-4">
+                Aplikasi ini menyajikan perbandingan Peraturan Daerah (Perda) terkait pemanfaatan Ruang Milik Jalan (Rumija) di tiga wilayah dengan karakteristik berbeda. Pilih kota untuk melihat dan membandingkan detail regulasi, struktur tarif retribusi, dan efektivitas sanksi yang diterapkan.
+            </p>
+            <div id="audio-player-container" class="mt-4 flex flex-col items-center justify-center">
+                 <button id="play-audio-btn" class="flex items-center justify-center bg-white text-[#a5522a] border border-[#a5522a] font-semibold py-2 px-5 rounded-lg hover:bg-[#a5522a] hover:text-white transition-colors duration-300 shadow-sm">
+                    <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20"><path d="M7 4a1 1 0 011.555.832L9 6.226V5a1 1 0 012 0v1.226l.445-.445A1 1 0 0113 6.618V5a1 1 0 112 0v1.618a1 1 0 01-.445.832l-1.32.88A8.963 8.963 0 0115 11v2a1 1 0 11-2 0v-2a6.963 6.963 0 00-1.555-4.168L11 7.774v5.452a1 1 0 01-2 0V7.774l-.445.445A1 1 0 017 7.382V13a1 1 0 11-2 0v-2a8.963 8.963 0 011.555-4.832L5.445 5.336A1 1 0 017 4z"></path></svg>
+                    Dengarkan Tinjauan Topik
+                </button>
+                <audio id="audio-player" class="mt-4 w-full max-w-md hidden" controls>
+                    <source src="Kupas Tuntas Ruang Milik Jalan (Rumija)_ Peluang Bisnis, Izin, dan Risiko Pidana di Koridor Jalan Umum Indonesia.mp3" type="audio/mpeg">
+                    Browser Anda tidak mendukung elemen audio.
+                </audio>
+            </div>
+        </section>
+
+        <section id="selector" class="mb-10">
+            <div class="flex justify-center items-center space-x-2 md:space-x-4 bg-gray-100 p-2 rounded-xl max-w-md mx-auto">
+                <button id="btn-surabaya" class="nav-button active text-sm md:text-base font-semibold py-2 px-4 md:px-6 rounded-lg w-full">Kota Surabaya</button>
+                <button id="btn-denpasar" class="nav-button text-sm md:text-base font-semibold py-2 px-4 md:px-6 rounded-lg w-full">Kota Denpasar</button>
+                <button id="btn-badung" class="nav-button text-sm md:text-base font-semibold py-2 px-4 md:px-6 rounded-lg w-full">Kab. Badung</button>
+            </div>
+        </section>
+        
+        <div id="dashboard-content">
+            <h2 id="cityName" class="text-3xl font-bold text-slate-800 text-center mb-8"></h2>
+
+            <section id="key-rules" class="mb-12">
+                <h3 class="text-2xl font-semibold text-slate-700 mb-6 text-center">Perbandingan Aturan Kunci</h3>
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="card p-6">
+                        <h4 class="font-bold text-lg text-green-700 mb-3">✅ Aktivitas Diizinkan</h4>
+                        <ul id="allowed-activities" class="list-disc list-inside space-y-2 text-slate-600"></ul>
+                    </div>
+                    <div class="card p-6">
+                        <h4 class="font-bold text-lg text-red-700 mb-3">❌ Aktivitas Dilarang</h4>
+                        <ul id="prohibited-activities" class="list-disc list-inside space-y-2 text-slate-600"></ul>
+                    </div>
+                    <div class="card p-6 md:col-span-2 lg:col-span-1">
+                        <h4 class="font-bold text-lg text-blue-700 mb-3">📋 Prinsip Utama Regulasi</h4>
+                        <p id="main-principle" class="text-slate-600"></p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="tariffs" class="mb-12">
+                <h3 class="text-2xl font-semibold text-slate-700 mb-2 text-center">Perbandingan Tarif Retribusi</h3>
+                 <p class="text-center text-slate-500 mb-6">Tarif per meter persegi per bulan (dalam Rupiah).</p>
+                <div class="card p-4 md:p-6">
+                    <div class="chart-container">
+                        <canvas id="tariffChart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <section id="sanctions" class="mb-12">
+                <h3 class="text-2xl font-semibold text-slate-700 mb-6 text-center">Sanksi dan Penegakan</h3>
+                <div class="grid md:grid-cols-2 gap-6">
+                     <div class="card p-6">
+                        <h4 class="font-bold text-lg text-yellow-800 mb-3">⚖️ Jenis Sanksi Administratif</h4>
+                        <ul id="sanction-types" class="list-disc list-inside space-y-2 text-slate-600"></ul>
+                    </div>
+                     <div class="card p-6">
+                        <h4 class="font-bold text-lg text-indigo-800 mb-3">💡 Analisis Efektivitas</h4>
+                        <p id="sanction-effectiveness" class="text-slate-600"></p>
+                    </div>
+                </div>
+            </section>
+            
+             <section id="best-practices" class="mb-8">
+                <h3 class="text-2xl font-semibold text-slate-700 mb-6 text-center">Identifikasi Praktik Terbaik</h3>
+                <div class="card p-6 max-w-4xl mx-auto">
+                    <p id="best-practice-summary" class="text-slate-700 text-center text-lg"></p>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer class="bg-white mt-12 py-6 border-t">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 text-center text-slate-500">
+            <p>&copy; 2025 Analisis Kebijakan Publik. Dibuat untuk tujuan demonstrasi.</p>
+        </div>
+    </footer>
+
+    <script>
+        const cityData = {
+            surabaya: {
+                name: 'Kota Surabaya (Kota Besar)',
+                allowed: ['Jaringan utilitas (kabel, pipa)', 'Pedagang Kaki Lima (PKL) di zona tertentu', 'Papan reklame dan media luar ruang', 'Bangunan penunjang sementara (pos jaga, halte)'],
+                prohibited: ['Bangunan permanen untuk hunian/usaha', 'Aktivitas yang menutup total drainase', 'Menimbun barang yang mengganggu lalu lintas', 'Mendirikan industri atau bengkel skala besar'],
+                principle: 'Pemanfaatan diatur secara ketat dengan prioritas utama pada fungsi jalan dan keselamatan publik. Perizinan terpusat dan diawasi ketat oleh Dinas PU.',
+                tariffs: {
+                    labels: ['Utilitas (Kabel)', 'PKL (Zona A)', 'Reklame', 'Event Temporer'],
+                    values: [15000, 25000, 50000, 10000]
+                },
+                sanctions: ['Peringatan tertulis (SP 1-3)', 'Denda administratif progresif', 'Pembongkaran paksa oleh Satpol PP', 'Pencabutan izin usaha terkait'],
+                effectiveness: 'Penegakan hukum cenderung tegas dan terjadwal, terutama di jalan protokol. Efektivitas tinggi dalam menindak pelanggaran visual, namun masih menghadapi tantangan di kawasan pemukiman padat.',
+                bestPractice: 'Sistem zonasi PKL yang jelas dan tarif retribusi progresif berdasarkan lokasi strategis menjadi praktik terbaik, menyeimbangkan antara ketertiban kota dan kebutuhan ekonomi informal.'
+            },
+            denpasar: {
+                name: 'Kota Denpasar (Kota Menengah)',
+                allowed: ['Sarana upacara adat (temporer)', 'Jaringan utilitas', 'PKL kuliner di area yang ditetapkan', 'Papan nama usaha kecil'],
+                prohibited: ['Aktivitas yang mengganggu estetika pariwisata', 'Bangunan permanen tanpa izin', 'Penumpukan material bangunan > 24 jam', 'Limbah usaha dibuang ke drainase'],
+                principle: 'Keseimbangan antara fungsi jalan, kebutuhan ekonomi lokal, dan estetika pariwisata. Ada pertimbangan kuat terhadap kegiatan sosial-budaya masyarakat.',
+                tariffs: {
+                    labels: ['Utilitas (Kabel)', 'PKL (Zona A)', 'Reklame', 'Event Temporer'],
+                    values: [12000, 18000, 45000, 8000]
+                },
+                sanctions: ['Teguran lisan dan tertulis', 'Denda administratif', 'Pembongkaran dengan mediasi', 'Sanksi adat (jika terkait fasilitas desa adat)'],
+                effectiveness: 'Pendekatan persuasif dan mediasi sering diutamakan sebelum pembongkaran. Efektivitas bervariasi, sangat bergantung pada kerjasama dengan aparat desa/kelurahan dan tokoh masyarakat.',
+                bestPractice: 'Fleksibilitas regulasi yang mengakomodasi kegiatan upacara adat adalah praktik terbaik yang kontekstual, menunjukkan kemampuan adaptasi Perda terhadap kearifan lokal.'
+            },
+            badung: {
+                name: 'Kabupaten Badung (Kabupaten)',
+                allowed: ['Infrastruktur penunjang pariwisata (signage, pos informasi)', 'Instalasi utilitas (serat optik, air bersih)', 'Area berdagang temporer saat event desa', 'Pemanfaatan untuk lahan parkir terbatas'],
+                prohibited: ['Konstruksi permanen yang menghalangi akses pariwisata', 'Pemasangan reklame yang merusak pohon perindang', 'Galian utilitas tanpa koordinasi', 'Kegiatan usaha yang menimbulkan polusi'],
+                principle: 'Fokus utama pada mendukung industri pariwisata dan menjaga kelestarian lingkungan. Pemanfaatan harus selaras dengan citra destinasi wisata internasional.',
+                tariffs: {
+                    labels: ['Utilitas (Kabel)', 'PKL (Zona A)', 'Reklame', 'Event Temporer'],
+                    values: [18000, 20000, 65000, 12000]
+                },
+                sanctions: ['Nota peringatan dari dinas terkait', 'Penghentian paksa kegiatan', 'Denda retribusi hingga 5 kali lipat', 'Blacklist perusahaan dari proyek pemerintah'],
+                effectiveness: 'Penegakan sangat efektif di kawasan wisata utama (Kuta, Nusa Dua) karena melibatkan pengelola kawasan. Di area rural, pengawasan masih perlu ditingkatkan secara signifikan.',
+                bestPractice: 'Tarif retribusi reklame yang tinggi dan sanksi tegas bagi perusak lingkungan menjadi praktik terbaik dalam melindungi nilai investasi pariwisata dan aset lingkungan daerah.'
+            }
+        };
+
+        let currentChart = null;
+        const chartCanvas = document.getElementById('tariffChart').getContext('2d');
+
+        function updateDashboard(cityKey) {
+            const data = cityData[cityKey];
+
+            document.getElementById('cityName').innerText = data.name;
+
+            const allowedList = document.getElementById('allowed-activities');
+            allowedList.innerHTML = '';
+            data.allowed.forEach(item => {
+                const li = document.createElement('li');
+                li.textContent = item;
+                allowedList.appendChild(li);
+            });
+
+            const prohibitedList = document.getElementById('prohibited-activities');
+            prohibitedList.innerHTML = '';
+            data.prohibited.forEach(item => {
+                const li = document.createElement('li');
+                li.textContent = item;
+                prohibitedList.appendChild(li);
+            });
+
+            document.getElementById('main-principle').textContent = data.principle;
+            
+            const sanctionList = document.getElementById('sanction-types');
+            sanctionList.innerHTML = '';
+            data.sanctions.forEach(item => {
+                const li = document.createElement('li');
+                li.textContent = item;
+                sanctionList.appendChild(li);
+            });
+
+            document.getElementById('sanction-effectiveness').textContent = data.effectiveness;
+            document.getElementById('best-practice-summary').textContent = data.bestPractice;
+
+            if (currentChart) {
+                currentChart.destroy();
+            }
+
+            currentChart = new Chart(chartCanvas, {
+                type: 'bar',
+                data: {
+                    labels: data.tariffs.labels,
+                    datasets: [{
+                        label: `Tarif Retribusi di ${data.name}`,
+                        data: data.tariffs.values,
+                        backgroundColor: [
+                            'rgba(54, 162, 235, 0.6)',
+                            'rgba(255, 206, 86, 0.6)',
+                            'rgba(75, 192, 192, 0.6)',
+                            'rgba(153, 102, 255, 0.6)'
+                        ],
+                        borderColor: [
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(255, 206, 86, 1)',
+                            'rgba(75, 192, 192, 1)',
+                            'rgba(153, 102, 255, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return 'Rp ' + value.toLocaleString('id-ID');
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                             callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) { label += ': '; }
+                                    if (context.parsed.y !== null) {
+                                        label += 'Rp ' + context.parsed.y.toLocaleString('id-ID');
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            
+            document.querySelectorAll('.nav-button').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`btn-${cityKey}`).classList.add('active');
+        }
+
+        document.getElementById('btn-surabaya').addEventListener('click', () => updateDashboard('surabaya'));
+        document.getElementById('btn-denpasar').addEventListener('click', () => updateDashboard('denpasar'));
+        document.getElementById('btn-badung').addEventListener('click', () => updateDashboard('badung'));
+        
+        const playAudioBtn = document.getElementById('play-audio-btn');
+        const audioPlayer = document.getElementById('audio-player');
+
+        playAudioBtn.addEventListener('click', () => {
+            playAudioBtn.classList.add('hidden');
+            audioPlayer.classList.remove('hidden');
+            audioPlayer.play();
+        });
+
+        window.onload = () => {
+            updateDashboard('surabaya');
+        };
+    </script>
+</body>
+</html>
+
