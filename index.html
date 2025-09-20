@@ -60,21 +60,27 @@
                 Aplikasi ini menyajikan perbandingan Peraturan Daerah (Perda) terkait pemanfaatan Ruang Milik Jalan (Rumija) di tiga wilayah dengan karakteristik berbeda. Pilih kota untuk melihat dan membandingkan detail regulasi, struktur tarif retribusi, dan efektivitas sanksi yang diterapkan.
             </p>
             
-            <div class="my-6 flex flex-col sm:flex-row items-center justify-center gap-4">
-                <a href="Pemanfaatan Daerah Milik Jalan Swasta.pdf" target="_blank" class="flex items-center justify-center bg-[#a5522a] text-white font-semibold py-2 px-5 rounded-lg hover:bg-opacity-90 transition-colors duration-300 shadow-sm w-full sm:w-auto">
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                    Unduh Laporan Lengkap (PDF)
-                </a>
+            <div class="mt-6 flex flex-col sm:flex-row items-center justify-center gap-4">
                 <button id="play-audio-btn" class="flex items-center justify-center bg-white text-[#a5522a] border border-[#a5522a] font-semibold py-2 px-5 rounded-lg hover:bg-[#a5522a] hover:text-white transition-colors duration-300 shadow-sm w-full sm:w-auto">
                     <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20"><path d="M7 4a1 1 0 011.555.832L9 6.226V5a1 1 0 012 0v1.226l.445-.445A1 1 0 0113 6.618V5a1 1 0 112 0v1.618a1 1 0 01-.445.832l-1.32.88A8.963 8.963 0 0115 11v2a1 1 0 11-2 0v-2a6.963 6.963 0 00-1.555-4.168L11 7.774v5.452a1 1 0 01-2 0V7.774l-.445.445A1 1 0 017 7.382V13a1 1 0 11-2 0v-2a8.963 8.963 0 011.555-4.832L5.445 5.336A1 1 0 017 4z"></path></svg>
-                    Dengarkan Tinjauan Topik
+                    Dengarkan Tinjauan Audio
+                </button>
+                <button id="play-video-btn" class="flex items-center justify-center bg-white text-[#a5522a] border border-[#a5522a] font-semibold py-2 px-5 rounded-lg hover:bg-[#a5522a] hover:text-white transition-colors duration-300 shadow-sm w-full sm:w-auto">
+                     <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"></path></svg>
+                    Tonton Tinjauan Video
                 </button>
             </div>
+            
             <audio id="audio-player" class="mt-4 w-full max-w-md mx-auto hidden" controls>
                 <source src="Kupas Tuntas Ruang Milik Jalan (Rumija)_ Peluang Bisnis, Izin, dan Risiko Pidana di Koridor Jalan Umum Indonesia.mp3" type="audio/mpeg">
                 Browser Anda tidak mendukung elemen audio.
             </audio>
-            </section>
+            
+            <video id="video-player" class="mt-4 w-full max-w-xl mx-auto hidden rounded-lg shadow-lg" controls>
+                <source src="Peta_Jalan_Menuju_Rumija 1.mp4" type="video/mp4">
+                Browser Anda tidak mendukung elemen video.
+            </video>
+        </section>
 
         <section id="selector" class="mb-10">
             <div class="flex justify-center items-center space-x-2 md:space-x-4 bg-gray-100 p-2 rounded-xl max-w-md mx-auto">
@@ -141,6 +147,12 @@
     <footer class="bg-white mt-12 py-6 border-t">
         <div class="container mx-auto px-4 sm:px-6 lg:px-8 text-center text-slate-500">
             <p>&copy; 2025 Analisis Kebijakan Publik. Dibuat untuk tujuan demonstrasi.</p>
+            <p class="mt-2">
+                <a href="Pemanfaatan Daerah Milik Jalan Swasta.pdf" target="_blank" class="text-blue-600 hover:underline">Unduh Laporan Lengkap (PDF)</a>
+            </p>
+            <p class="mt-2">
+                Materi PPT dapat diakses di: <a href="https://chat.z.ai/space/d0gzq7kvgfw0-ppt" target="_blank" class="text-blue-600 hover:underline">Link Presentasi</a>
+            </p>
         </div>
     </footer>
 
@@ -293,11 +305,27 @@
         
         const playAudioBtn = document.getElementById('play-audio-btn');
         const audioPlayer = document.getElementById('audio-player');
+        const playVideoBtn = document.getElementById('play-video-btn');
+        const videoPlayer = document.getElementById('video-player');
 
         playAudioBtn.addEventListener('click', () => {
+            videoPlayer.classList.add('hidden');
+            videoPlayer.pause();
+            playVideoBtn.classList.remove('hidden');
+
             playAudioBtn.classList.add('hidden');
             audioPlayer.classList.remove('hidden');
             audioPlayer.play();
+        });
+
+        playVideoBtn.addEventListener('click', () => {
+            audioPlayer.classList.add('hidden');
+            audioPlayer.pause();
+            playAudioBtn.classList.remove('hidden');
+
+            playVideoBtn.classList.add('hidden');
+            videoPlayer.classList.remove('hidden');
+            videoPlayer.play();
         });
 
         window.onload = () => {
